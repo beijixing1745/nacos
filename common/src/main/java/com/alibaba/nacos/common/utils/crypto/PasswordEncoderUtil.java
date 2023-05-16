@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2022 Alibaba Group Holding Ltd.
+ * Copyright 1999-2018 Alibaba Group Holding Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package com.alibaba.nacos.plugin.datasource.constants;
+package com.alibaba.nacos.common.utils.crypto;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
- * The data source name.
+ * Password encoder tool.
  *
- * @author hyx
- **/
-
-public class DataSourceConstant {
-    public static final String MYSQL = "mysql";
+ * @author beijixing1745
+ */
+public class PasswordEncoderUtil {
     
-    public static final String DERBY = "derby";
-
-    public static final String POSTGRESQL = "postgresql";
+    public static Boolean matches(String raw, String encoded) {
+        return new BCryptPasswordEncoder().matches(raw, encoded);
+    }
+    
+    public static String encode(String raw) {
+        return new BCryptPasswordEncoder().encode(raw);
+    }
 }

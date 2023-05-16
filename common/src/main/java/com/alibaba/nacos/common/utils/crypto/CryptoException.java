@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2022 Alibaba Group Holding Ltd.
+ * Copyright 1999-2018 Alibaba Group Holding Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package com.alibaba.nacos.plugin.datasource.constants;
+package com.alibaba.nacos.common.utils.crypto;
 
 /**
- * The data source name.
+ * Crypto Exception.
  *
- * @author hyx
- **/
+ * @author beijixing1745
+ */
+public class CryptoException extends RuntimeException {
+    public CryptoException(String msg) {
+        super(msg);
+    }
 
-public class DataSourceConstant {
-    public static final String MYSQL = "mysql";
-    
-    public static final String DERBY = "derby";
+    public CryptoException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 
-    public static final String POSTGRESQL = "postgresql";
+    public CryptoException(Throwable cause) {
+        super(cause);
+    }
 }

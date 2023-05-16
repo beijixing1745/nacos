@@ -17,6 +17,8 @@
 package com.alibaba.nacos.config.server.service.datasource;
 
 import com.zaxxer.hikari.HikariDataSource;
+import net.sf.log4jdbc.DataSourceSpyInterceptor;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.core.env.Environment;
@@ -46,7 +48,11 @@ public class DataSourcePoolProperties {
     private final HikariDataSource dataSource;
     
     private DataSourcePoolProperties() {
-        dataSource = new HikariDataSource();
+        ProxyFactory factory = new ProxyFactory();
+        factory.addAdvice(new DataSourceSpyInterceptor());
+        factory.setTarget(new HikariDataSource());
+        dataSource = (HikariDataSource) factory.getProxy();
+
         dataSource.setIdleTimeout(DEFAULT_IDLE_TIMEOUT);
         dataSource.setConnectionTimeout(DEFAULT_CONNECTION_TIMEOUT);
         dataSource.setValidationTimeout(DEFAULT_VALIDATION_TIMEOUT);

@@ -24,8 +24,9 @@ import com.alibaba.nacos.naming.misc.SwitchDomain;
 import com.alibaba.nacos.naming.pojo.Subscriber;
 import com.alibaba.nacos.naming.remote.udp.AckEntry;
 import com.alibaba.nacos.naming.remote.udp.UdpConnector;
-import org.apache.commons.collections.MapUtils;
-import org.codehaus.jackson.util.VersionUtil;
+import com.fasterxml.jackson.core.util.VersionUtil;
+import org.apache.commons.collections4.MapUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -46,16 +47,16 @@ import java.util.zip.GZIPOutputStream;
 @Component
 @SuppressWarnings("PMD.ThreadPoolCreationRule")
 public class UdpPushService {
-    
+
     @Autowired
     private SwitchDomain switchDomain;
-    
+
     private final UdpConnector udpConnector;
-    
+
     public UdpPushService(UdpConnector udpConnector) {
         this.udpConnector = udpConnector;
     }
-    
+
     /**
      * Push Data without callback.
      *
@@ -74,7 +75,7 @@ public class UdpPushService {
             Loggers.PUSH.error("[NACOS-PUSH] failed to push serviceName: {} to client, error: {}", serviceName, e);
         }
     }
-    
+
     /**
      * Push Data with callback.
      *
@@ -94,15 +95,15 @@ public class UdpPushService {
             Loggers.PUSH.error("[NACOS-PUSH] failed to push serviceName: {} to client, error: {}", serviceName, e);
         }
     }
-    
+
     private AckEntry prepareAckEntry(Subscriber subscriber, ServiceInfo serviceInfo) {
         InetSocketAddress socketAddress = new InetSocketAddress(subscriber.getIp(), subscriber.getPort());
         long lastRefTime = System.nanoTime();
         return prepareAckEntry(socketAddress, prepareHostsData(JacksonUtils.toJson(serviceInfo)), lastRefTime);
     }
-    
+
     private static AckEntry prepareAckEntry(InetSocketAddress socketAddress, Map<String, Object> data,
-            long lastRefTime) {
+                                            long lastRefTime) {
         if (MapUtils.isEmpty(data)) {
             Loggers.PUSH.error("[NACOS-PUSH] pushing empty data for client is not allowed: {}", socketAddress);
             return null;
@@ -119,9 +120,9 @@ public class UdpPushService {
             return null;
         }
     }
-    
+
     private static AckEntry prepareAckEntry(InetSocketAddress socketAddress, byte[] dataBytes, Map<String, Object> data,
-            long lastRefTime) {
+                                            long lastRefTime) {
         String key = AckEntry
                 .getAckKey(socketAddress.getAddress().getHostAddress(), socketAddress.getPort(), lastRefTime);
         try {
@@ -137,7 +138,7 @@ public class UdpPushService {
         }
         return null;
     }
-    
+
     /**
      * Judge whether this agent is supported to push.
      *
@@ -145,48 +146,48 @@ public class UdpPushService {
      * @return true if agent can be pushed, otherwise false
      */
     public boolean canEnablePush(String agent) {
-        
+
         if (!switchDomain.isPushEnabled()) {
             return false;
         }
-        
+
         ClientInfo clientInfo = new ClientInfo(agent);
-        
+
         if (ClientInfo.ClientType.JAVA == clientInfo.type
-                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushJavaVersion())) >= 0) {
+                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushJavaVersion(), null, null)) >= 0) {
             return true;
         } else if (ClientInfo.ClientType.DNS == clientInfo.type
-                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushPythonVersion())) >= 0) {
+                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushPythonVersion(), null, null)) >= 0) {
             return true;
         } else if (ClientInfo.ClientType.C == clientInfo.type
-                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushCVersion())) >= 0) {
+                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushCVersion(), null, null)) >= 0) {
             return true;
         } else if (ClientInfo.ClientType.GO == clientInfo.type
-                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushGoVersion())) >= 0) {
+                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushGoVersion(), null, null)) >= 0) {
             return true;
         } else if (ClientInfo.ClientType.CSHARP == clientInfo.type
-                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushCSharpVersion())) >= 0) {
+                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushCSharpVersion(), null, null)) >= 0) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     private static byte[] compressIfNecessary(byte[] dataBytes) throws IOException {
         // enable compression when data is larger than 1KB
         int maxDataSizeUncompress = 1024;
         if (dataBytes.length < maxDataSizeUncompress) {
             return dataBytes;
         }
-        
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         GZIPOutputStream gzip = new GZIPOutputStream(out);
         gzip.write(dataBytes);
         gzip.close();
-        
+
         return out.toByteArray();
     }
-    
+
     private static Map<String, Object> prepareHostsData(String dataContent) {
         Map<String, Object> result = new HashMap<String, Object>(2);
         result.put("type", "dom");
