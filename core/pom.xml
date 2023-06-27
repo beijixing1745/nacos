@@ -111,8 +111,13 @@
         <dependency>
             <groupId>com.alipay.sofa</groupId>
             <artifactId>jraft-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>asm</artifactId>
+                    <groupId>org.ow2.asm</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
         <dependency>
             <groupId>com.alipay.sofa</groupId>
             <artifactId>rpc-grpc-impl</artifactId>
@@ -124,9 +129,14 @@
             <artifactId>httpasyncclient</artifactId>
         </dependency>
 
+<!--        <dependency>-->
+<!--            <groupId>commons-collections</groupId>-->
+<!--            <artifactId>commons-collections</artifactId>-->
+<!--        </dependency>-->
+
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
         </dependency>
 
         <!--   micrometer  start   -->

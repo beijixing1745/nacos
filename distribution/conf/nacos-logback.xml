@@ -581,7 +581,23 @@
             <charset>UTF-8</charset>
         </encoder>
     </appender>
-    
+
+    <appender name="jdbc-sql"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/jdbc-sql.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/jdbc-sql.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <maxFileSize>1GB</maxFileSize>
+            <maxHistory>2</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>%date %level %msg%n%n</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
     
     <logger name="com.alibaba.nacos.address.main" additivity="false">
         <level value="INFO"/>
@@ -744,6 +760,31 @@
             <level value="WARN"/>
         </logger>
 
+        <logger name="jdbc.sqlonly" additivity="false">
+            <level value="ERROR"/>
+            <appender-ref ref="jdbc-sql"/>
+        </logger>
+
+        <logger name="jdbc.sqltiming" additivity="false">
+            <level value="INFO"/>
+            <appender-ref ref="jdbc-sql"/>
+        </logger>
+
+        <logger name="jdbc.audit" additivity="false">
+            <level value="ERROR"/>
+            <appender-ref ref="jdbc-sql"/>
+        </logger>
+
+        <logger name="jdbc.resultset" additivity="false">
+            <level value="ERROR"/>
+            <appender-ref ref="jdbc-sql"/>
+        </logger>
+
+        <logger name="jdbc.connection" additivity="false">
+            <level value="ERROR"/>
+            <appender-ref ref="jdbc-sql"/>
+        </logger>
+
         <logger name="org.apache.tomcat.util.net.NioSelectorPool">
             <appender-ref ref="CONSOLE"/>
             <level value="WARN"/>
@@ -768,6 +809,31 @@
     <logger name="com.alibaba.nacos.common.executor.ThreadPoolManager">
         <appender-ref ref="CONSOLE"/>
         <level value="INFO"/>
+    </logger>
+
+    <logger name="jdbc.sqlonly" additivity="false">
+        <level value="ERROR"/>
+        <appender-ref ref="jdbc-sql"/>
+    </logger>
+
+    <logger name="jdbc.sqltiming" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="jdbc-sql"/>
+    </logger>
+
+    <logger name="jdbc.audit" additivity="false">
+        <level value="ERROR"/>
+        <appender-ref ref="jdbc-sql"/>
+    </logger>
+
+    <logger name="jdbc.resultset" additivity="false">
+        <level value="ERROR"/>
+        <appender-ref ref="jdbc-sql"/>
+    </logger>
+
+    <logger name="jdbc.connection" additivity="false">
+        <level value="ERROR"/>
+        <appender-ref ref="jdbc-sql"/>
     </logger>
 
     <root>

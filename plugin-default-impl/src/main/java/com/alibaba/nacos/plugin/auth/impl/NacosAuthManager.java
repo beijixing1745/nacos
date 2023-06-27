@@ -18,6 +18,7 @@ package com.alibaba.nacos.plugin.auth.impl;
 
 import com.alibaba.nacos.api.common.Constants;
 import com.alibaba.nacos.common.utils.StringUtils;
+import com.alibaba.nacos.common.utils.crypto.RsaUtils;
 import com.alibaba.nacos.core.utils.Loggers;
 import com.alibaba.nacos.plugin.auth.api.IdentityContext;
 import com.alibaba.nacos.plugin.auth.api.Permission;
@@ -28,6 +29,7 @@ import com.alibaba.nacos.plugin.auth.impl.roles.NacosRoleServiceImpl;
 import com.alibaba.nacos.plugin.auth.impl.token.TokenManagerDelegate;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -47,6 +49,8 @@ import java.util.List;
 @Component
 @Deprecated
 public class NacosAuthManager {
+    @Value("${app.rsaPrivateKey}")
+    String appRsaPrivateKey;
     
     @Autowired
     private TokenManagerDelegate tokenManager;
@@ -106,6 +110,7 @@ public class NacosAuthManager {
         if (StringUtils.isBlank(bearerToken)) {
             String userName = request.getParameter(AuthConstants.PARAM_USERNAME);
             String password = request.getParameter(AuthConstants.PARAM_PASSWORD);
+            password = RsaUtils.decrypt(password, RsaUtils.getPrivateKey(appRsaPrivateKey));
             bearerToken = resolveTokenFromUser(userName, password);
         }
         

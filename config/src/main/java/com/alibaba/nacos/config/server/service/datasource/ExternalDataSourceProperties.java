@@ -16,7 +16,10 @@ package com.alibaba.nacos.config.server.service.datasource;
 import com.alibaba.nacos.common.utils.Preconditions;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.commons.collections.CollectionUtils;
+
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.core.env.Environment;
@@ -32,36 +35,38 @@ import static com.alibaba.nacos.common.utils.CollectionUtils.getOrDefault;
  *
  * @author Nacos
  */
+@Slf4j
+@ToString
 public class ExternalDataSourceProperties {
-    
+
     private static final String JDBC_DRIVER_NAME = "com.mysql.cj.jdbc.Driver";
-    
+
     private static final String TEST_QUERY = "SELECT 1";
-    
+
     private Integer num;
-    
+
     private List<String> url = new ArrayList<>();
-    
+
     private List<String> user = new ArrayList<>();
-    
+
     private List<String> password = new ArrayList<>();
-    
+
     public void setNum(Integer num) {
         this.num = num;
     }
-    
+
     public void setUrl(List<String> url) {
         this.url = url;
     }
-    
+
     public void setUser(List<String> user) {
         this.user = user;
     }
-    
+
     public void setPassword(List<String> password) {
         this.password = password;
     }
-    
+
     /**
      * Build serveral HikariDataSource.
      *
@@ -85,19 +90,25 @@ public class ExternalDataSourceProperties {
             poolProperties.setJdbcUrl(url.get(index).trim());
             poolProperties.setUsername(getOrDefault(user, index, user.get(0)).trim());
             poolProperties.setPassword(getOrDefault(password, index, password.get(0)).trim());
+
             HikariDataSource ds = poolProperties.getDataSource();
             if (StringUtils.isEmpty(ds.getConnectionTestQuery())) {
                 ds.setConnectionTestQuery(TEST_QUERY);
             }
+
+            log.info("externalDataSourceProperties {}", this);
+            log.info("externalDataSourceProperties TEST_QUERY {}", TEST_QUERY);
+            log.info("externalDataSourceProperties JDBC_DRIVER_NAME {}", JDBC_DRIVER_NAME);
+
             dataSources.add(ds);
             callback.accept(ds);
         }
         Preconditions.checkArgument(CollectionUtils.isNotEmpty(dataSources), "no datasource available");
         return dataSources;
     }
-    
+
     interface Callback<D> {
-        
+
         /**
          * Perform custom logic.
          *
